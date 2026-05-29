@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FCE5E8; /* Richer warm blush rose canvas */
+  --foreground: #2E2528; /* Warm luxury charcoal text */
+}
+
+body {
+  color: var(--foreground);
+  background: radial-gradient(circle at top left, #FFE9EC, #FCE5E8 70%); /* Luxury dual-tone rosewater gradient */
+  background-color: var(--background);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Overriding bg-white container colors with soft blushing pearl cream to eliminate all harsh white backgrounds */
+.bg-white {
+  background-color: #FFF6F7 !important; /* Blushing pearl cream background */
+}
+
+/* Blushing glassmorphic backdrop overrides */
+.bg-white\/95 {
+  background-color: rgba(255, 246, 247, 0.95) !important;
+}
+.bg-white\/90 {
+  background-color: rgba(255, 246, 247, 0.9) !important;
+}
+.bg-white\/80 {
+  background-color: rgba(255, 246, 247, 0.8) !important;
+}
+.bg-white\/70 {
+  background-color: rgba(255, 246, 247, 0.7) !important;
+}
+.bg-white\/40 {
+  background-color: rgba(255, 246, 247, 0.4) !important;
+}
+.bg-white\/10 {
+  background-color: rgba(255, 246, 247, 0.1) !important;
+}
+
+/* Custom premium scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF6F6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5C387; /* Soft gold scrollbar thumb */
+  border-radius: 9999px;
+  border: 2px solid #FFF6F6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* Luxury card micro-interactions */
+.luxury-card-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(212, 175, 55, 0.15);
+}
+
+/* Elegant gold line under headers */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #D4AF37 50%, transparent);
+}
