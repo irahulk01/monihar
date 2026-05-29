@@ -62,6 +62,7 @@ function ProductsPageContent() {
     if (urlMaterial !== selectedMaterial) {
       setSelectedMaterial(urlMaterial);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   // 2. Fetch Products on filters modification

@@ -48,7 +48,7 @@ export default function ProductDetailPage() {
       }
     };
     if (id) fetchProduct();
-  }, [id]);
+  }, [id, addToast, router]);
 
   if (loading) {
     return (
