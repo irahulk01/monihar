@@ -33,7 +33,7 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between relative overflow-x-hidden font-sans">
+    <div className="min-h-screen flex flex-col justify-between relative overflow-x-clip font-sans">
       <div>
         <AnnouncementBar />
         <Navbar />
