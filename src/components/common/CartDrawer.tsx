@@ -13,7 +13,16 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { items, updateQuantity, removeItem, coupon, couponError, applyCoupon, removeCoupon, getTotals } = useCartStore();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    coupon,
+    couponError,
+    applyCoupon,
+    removeCoupon,
+    getTotals,
+  } = useCartStore();
   const { addToast } = useToastStore();
   const [couponCode, setCouponCode] = useState("");
 
@@ -25,16 +34,28 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
     const success = applyCoupon(couponCode);
     if (success) {
-      addToast("Coupon Applied!", "success", `Discount active for code: ${couponCode.toUpperCase()}`);
+      addToast(
+        "Coupon Applied!",
+        "success",
+        `Discount active for code: ${couponCode.toUpperCase()}`,
+      );
       setCouponCode("");
     } else {
-      addToast("Coupon Failed", "error", "The code you entered is invalid or does not meet minimum totals.");
+      addToast(
+        "Coupon Failed",
+        "error",
+        "The code you entered is invalid or does not meet minimum totals.",
+      );
     }
   };
 
   const handleRemoveCoupon = () => {
     removeCoupon();
-    addToast("Coupon Removed", "info", "Discount coupon has been removed from your cart.");
+    addToast(
+      "Coupon Removed",
+      "info",
+      "Discount coupon has been removed from your cart.",
+    );
   };
 
   return (
@@ -63,7 +84,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
                 <h2 className="font-serif text-lg md:text-xl font-semibold tracking-wide text-[#2E2528]">
-                  Your Shopping Bag ({items.reduce((acc, item) => acc + item.quantity, 0)})
+                  Your Shopping Bag (
+                  {items.reduce((acc, item) => acc + item.quantity, 0)})
                 </h2>
               </div>
               <button
@@ -86,7 +108,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     Your bag is empty
                   </h3>
                   <p className="text-xs text-[#6B5E62] max-w-[250px]">
-                    Fill it with handpicked luxury creations from our trending collection.
+                    Fill it with handpicked luxury creations from our trending
+                    collection.
                   </p>
                   <button
                     onClick={onClose}
@@ -109,7 +132,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
+
                     <div className="flex-grow flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start">
@@ -119,7 +142,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           <button
                             onClick={() => {
                               removeItem(item.product.id, item.selectedSize);
-                              addToast("Removed from bag", "info", `${item.product.name} has been removed.`);
+                              addToast(
+                                "Removed from bag",
+                                "info",
+                                `${item.product.name} has been removed.`,
+                              );
                             }}
                             className="text-[#6B5E62] hover:text-red-500 p-1"
                           >
@@ -127,7 +154,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           </button>
                         </div>
                         <p className="text-[10px] text-[#6B5E62] mt-0.5">
-                          Size: <span className="font-semibold text-[#2E2528]">{item.selectedSize}</span> • Metal: <span className="font-semibold text-[#2E2528]">{item.product.specifications.Metal}</span>
+                          Size:{" "}
+                          <span className="font-semibold text-[#2E2528]">
+                            {item.selectedSize}
+                          </span>{" "}
+                          • Metal:{" "}
+                          <span className="font-semibold text-[#2E2528]">
+                            {item.product.specifications.Metal}
+                          </span>
                         </p>
                       </div>
 
@@ -135,14 +169,28 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         {/* Quantity controls */}
                         <div className="flex items-center border border-[#D4AF37]/30 rounded bg-[#FFF6F6] overflow-hidden">
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.selectedSize, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.selectedSize,
+                                item.quantity - 1,
+                              )
+                            }
                             className="p-1 hover:bg-[#FDE2E4] transition-colors"
                           >
                             <Minus className="w-3 h-3 text-[#2E2528]" />
                           </button>
-                          <span className="px-2 text-xs font-bold text-[#2E2528]">{item.quantity}</span>
+                          <span className="px-2 text-xs font-bold text-[#2E2528]">
+                            {item.quantity}
+                          </span>
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.selectedSize, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.selectedSize,
+                                item.quantity + 1,
+                              )
+                            }
                             className="p-1 hover:bg-[#FDE2E4] transition-colors"
                           >
                             <Plus className="w-3 h-3 text-[#2E2528]" />
@@ -152,7 +200,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         {/* Price */}
                         <div className="text-right">
                           <span className="text-xs font-bold text-[#D4AF37]">
-                            ₹{(item.product.price * item.quantity).toLocaleString("en-IN")}
+                            ₹
+                            {(
+                              item.product.price * item.quantity
+                            ).toLocaleString("en-IN")}
                           </span>
                         </div>
                       </div>
@@ -215,17 +266,25 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 {/* Subtotals breakdown */}
                 <div className="space-y-1.5 text-xs text-[#2E2528]">
                   <div className="flex justify-between">
-                    <span className="text-[#6B5E62] uppercase tracking-wide">Subtotal</span>
-                    <span className="font-semibold">₹{subtotal.toLocaleString("en-IN")}</span>
+                    <span className="text-[#6B5E62] uppercase tracking-wide">
+                      Subtotal
+                    </span>
+                    <span className="font-semibold">
+                      ₹{subtotal.toLocaleString("en-IN")}
+                    </span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-[#D4AF37]">
                       <span className="uppercase tracking-wide">Discount</span>
-                      <span className="font-semibold">-₹{discount.toLocaleString("en-IN")}</span>
+                      <span className="font-semibold">
+                        -₹{discount.toLocaleString("en-IN")}
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span className="text-[#6B5E62] uppercase tracking-wide">Shipping</span>
+                    <span className="text-[#6B5E62] uppercase tracking-wide">
+                      Shipping
+                    </span>
                     <span className="font-semibold">
                       {shipping === 0 ? (
                         <span className="text-[#D4AF37] uppercase tracking-wider font-bold text-[10px]">
@@ -238,13 +297,18 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </div>
                   {shipping > 0 && (
                     <p className="text-[9px] text-[#6B5E62] text-right">
-                      Add ₹{(1499 - subtotal).toLocaleString("en-IN")} more for free shipping
+                      Add ₹{(1499 - subtotal).toLocaleString("en-IN")} more for
+                      free shipping
                     </p>
                   )}
                   <div className="h-px bg-[#D4AF37]/10 my-2" />
                   <div className="flex justify-between text-sm md:text-base font-bold text-[#2E2528]">
-                    <span className="font-serif uppercase tracking-wider">Estimated Total</span>
-                    <span className="text-[#D4AF37]">₹{total.toLocaleString("en-IN")}</span>
+                    <span className="font-serif uppercase tracking-wider">
+                      Estimated Total
+                    </span>
+                    <span className="text-[#D4AF37]">
+                      ₹{total.toLocaleString("en-IN")}
+                    </span>
                   </div>
                 </div>
 

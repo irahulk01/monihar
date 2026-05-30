@@ -3,76 +3,192 @@
 @tailwind utilities;
 
 :root {
-  --background: #FCE5E8; /* Richer warm blush rose canvas */
-  --foreground: #2E2528; /* Warm luxury charcoal text */
+  --background: #FFF9FC; /* Soft luxury blush ivory canvas */
+  --foreground: #2C1B24; /* Deep luxury chocolate charcoal text */
+  --accent-rose: #E75480; /* Primary brand pink accent */
+  --accent-gold: #D4AF37; /* Luxury burnished gold accent */
+  --text-muted: #7A6A73; /* Muted grey-pink slate text */
+  
+  --pearl-surface: #FFF5FA;
+  --pink-glaze: #FFEFF7;
 }
 
 body {
   color: var(--foreground);
-  background: radial-gradient(circle at top left, #FFE9EC, #FCE5E8 70%); /* Luxury dual-tone rosewater gradient */
+  background: radial-gradient(circle at top left, #FFF9FC, #FFF5FA 50%, #FFEFF7 100%);
   background-color: var(--background);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Overriding bg-white container colors with soft blushing pearl cream to eliminate all harsh white backgrounds */
+/* Luxury container background overrides to eliminate standard white cards */
 .bg-white {
-  background-color: #FFF6F7 !important; /* Blushing pearl cream background */
+  background-color: var(--pearl-surface) !important;
 }
 
-/* Blushing glassmorphic backdrop overrides */
 .bg-white\/95 {
-  background-color: rgba(255, 246, 247, 0.95) !important;
-}
-.bg-white\/90 {
-  background-color: rgba(255, 246, 247, 0.9) !important;
-}
-.bg-white\/80 {
-  background-color: rgba(255, 246, 247, 0.8) !important;
-}
-.bg-white\/70 {
-  background-color: rgba(255, 246, 247, 0.7) !important;
-}
-.bg-white\/40 {
-  background-color: rgba(255, 246, 247, 0.4) !important;
-}
-.bg-white\/10 {
-  background-color: rgba(255, 246, 247, 0.1) !important;
+  background-color: rgba(255, 245, 250, 0.95) !important;
 }
 
-/* Custom premium scrollbar styling */
+.bg-white\/90 {
+  background-color: rgba(255, 245, 250, 0.9) !important;
+}
+
+.bg-white\/80 {
+  background-color: rgba(255, 245, 250, 0.8) !important;
+}
+
+.bg-white\/70 {
+  background-color: rgba(255, 245, 250, 0.7) !important;
+}
+
+.bg-white\/40 {
+  background-color: rgba(255, 245, 250, 0.4) !important;
+}
+
+/* Custom premium scrollbar in warm gold */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FFF6F6;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E5C387; /* Soft gold scrollbar thumb */
+  background: var(--accent-gold);
   border-radius: 9999px;
-  border: 2px solid #FFF6F6;
+  border: 1px solid var(--background);
+  opacity: 0.8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37;
+  background: #AA7C11;
 }
 
-/* Luxury card micro-interactions */
-.luxury-card-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* Infinite Marquee Track Animation */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
-.luxury-card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px -10px rgba(212, 175, 55, 0.15);
+.animate-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
 }
 
-/* Elegant gold line under headers */
-.gold-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #D4AF37 50%, transparent);
+.animate-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Pinterest Masonry styling */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 1.5rem;
+  grid-auto-flow: dense;
+}
+
+@media (min-width: 768px) {
+  .masonry-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+.masonry-item {
+  break-inside: avoid;
+}
+
+.masonry-item-tall {
+  grid-row: span 2;
+}
+
+.masonry-item-wide {
+  grid-column: span 2;
+}
+
+/* Luxury card shadow & glow overlays */
+.luxury-card {
+  position: relative;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+.luxury-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -15px rgba(231, 84, 128, 0.12), 0 10px 25px -10px rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+/* Floating custom cursor configurations */
+.custom-cursor {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s, height 0.3s, transform 0.2s;
+}
+
+.custom-cursor-ring {
+  border-radius: 50%;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9998;
+  transition: width 0.3s, height 0.3s, border-color 0.3s, border-style 0.3s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hide default cursor on desktop environments */
+@media (min-width: 1024px) {
+  .luxury-cursor-active {
+    cursor: none;
+  }
+  .luxury-cursor-active a,
+  .luxury-cursor-active button,
+  .luxury-cursor-active select,
+  .luxury-cursor-active input,
+  .luxury-cursor-active textarea,
+  .luxury-cursor-active [role="button"] {
+    cursor: none;
+  }
+}
+
+/* Custom loading states and shimmer effects */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-loader {
+  background: linear-gradient(90deg, #FFF5FA 25%, #FFEFF7 50%, #FFF5FA 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+/* Magazine Typography reveals */
+.editorial-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: editorialRevealAnim 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes editorialRevealAnim {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

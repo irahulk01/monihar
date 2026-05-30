@@ -6,9 +6,11 @@ import { Product } from "@/types";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useToastStore } from "@/store/useToastStore";
+import productsData from "@/data/products.json";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Heart, ShoppingBag, Star, Share2, Shield, Gift, RefreshCw, Award } from "lucide-react";
+import { Heart, ShoppingBag, Star, Share2, Shield, Gift, RefreshCw, Award, ArrowRight, Eye } from "lucide-react";
+import Link from "next/link";
 
 export default function ProductDetailPage() {
   const { id } = useParams() as { id: string };
@@ -25,6 +27,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"spec" | "shipping" | "gifting">("spec");
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   // Fetch product detail on mount/ID change
   useEffect(() => {
@@ -37,6 +40,12 @@ export default function ProductDetailPage() {
           setProduct(data.product);
           setSelectedImage(data.product.images[0]);
           setSelectedSize(data.product.sizes[0] || "One Size");
+
+          // Filter related products from local database
+          const related = (productsData as Product[]).filter(
+            (p) => p.category === data.product.category && p.id !== data.product.id
+          ).slice(0, 4);
+          setRelatedProducts(related);
         } else {
           addToast("Product Not Found", "error", "The dynamic jewellery item does not exist.");
           router.push("/products");
@@ -53,7 +62,7 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <PageWrapper>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <ProductDetailSkeleton />
         </div>
       </PageWrapper>
@@ -81,98 +90,123 @@ export default function ProductDetailPage() {
   const handleShare = () => {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
-      addToast("Link Copied", "info", "Product link copied to your clipboard. Share the luxury!");
+      addToast("Link Copied", "info", "Product link copied to clipboard. Share the luxury!");
     }
   };
 
+  const lookbookImages = [
+    "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&auto=format&fit=crop&q=80",
+  ];
+
   return (
     <PageWrapper>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 select-none">
         
+        {/* Breadcrumb */}
+        <div className="text-left mb-8 text-[10px] font-bold uppercase tracking-[0.25em] text-[#7A6A73]">
+          <Link href="/" className="hover:text-[#E75480] transition-colors">Home</Link>
+          <span className="mx-2.5 text-[#D4AF37]">✦</span>
+          <Link href="/products" className="hover:text-[#E75480] transition-colors">Collections</Link>
+          <span className="mx-2.5 text-[#D4AF37]">✦</span>
+          <span className="text-[#2C1B24]">{product.name}</span>
+        </div>
+
         {/* Product Details Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* LEFT COLUMN: Premium Thumbnail and Zoom Gallery */}
-          <div className="space-y-4">
+          {/* LEFT COLUMN: Editorial Stacked Gallery (7-columns) */}
+          <div className="lg:col-span-7 space-y-6">
             
-            {/* Main Image View */}
-            <div className="relative aspect-square bg-[#FFF6F6] rounded-xl overflow-hidden border border-[#D4AF37]/20 p-2 shadow-luxury flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* Primary Spotlight Frame */}
+            <div className="relative aspect-square bg-[#FFEFF7] rounded-3xl overflow-hidden border border-[#D4AF37]/20 p-3 bg-white shadow-luxury flex items-center justify-center">
               <img
                 src={selectedImage}
                 alt={product.name}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover rounded-[20px]"
               />
               {!product.inStock && (
-                <div className="absolute inset-0 bg-[#2E2528]/45 flex items-center justify-center rounded-lg">
-                  <span className="bg-white text-[#2E2528] text-xs font-bold tracking-widest uppercase py-2 px-6 shadow-md rounded border border-[#D4AF37]/30">
-                    Out of Stock
+                <div className="absolute inset-0 bg-[#2C1B24]/40 flex items-center justify-center rounded-3xl z-10">
+                  <span className="bg-white text-[#2C1B24] text-xs font-bold tracking-[0.25em] uppercase py-2.5 px-7 shadow-md rounded border border-[#D4AF37]/25">
+                    Temporarily Sold Out
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Thumbnails Row */}
-            <div className="grid grid-cols-4 gap-3">
+            {/* Premium Asymmetric Thumbnail Gallery */}
+            <div className="grid grid-cols-4 gap-4">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setSelectedImage(img)}
-                  className={`aspect-square rounded-md overflow-hidden bg-[#FFF6F6] border p-0.5 transition-all duration-300 ${
+                  className={`aspect-square rounded-xl overflow-hidden bg-[#FFF5FA] border p-1 transition-all duration-300 ${
                     selectedImage === img
-                      ? "border-[#D4AF37] scale-105 shadow-sm"
+                      ? "border-[#E75480] scale-103 shadow-md"
                       : "border-[#D4AF37]/20 opacity-70 hover:opacity-100"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img}
                     alt={`${product.name} detail ${idx + 1}`}
-                    className="w-full h-full object-cover rounded"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </button>
               ))}
             </div>
 
+            {/* Design statement under the image */}
+            <div className="hidden lg:block bg-[#FFF5FA] p-6 rounded-2xl border border-[#D4AF37]/15 text-left mt-8">
+              <span className="text-[8px] font-bold tracking-widest text-[#D4AF37] uppercase block mb-1">Brand Legacy</span>
+              <p className="font-serif text-xs text-[#2C1B24] leading-relaxed italic">
+                &ldquo;Every stone, metal luster, and bead loop represents a customized piece. Monihar honors self-expression in modern lifestyle layouts.&rdquo;
+              </p>
+            </div>
+
           </div>
 
-          {/* RIGHT COLUMN: Selection details */}
-          <div className="space-y-6 text-left">
+          {/* RIGHT COLUMN: Sticky Information Details (5-columns) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-[110px] space-y-8 text-left">
             
-            {/* Header info */}
-            <div className="space-y-2">
+            {/* Main Identification Header */}
+            <div className="space-y-3.5">
               <div className="flex justify-between items-start gap-4">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#D4AF37]">
                     {product.category} Collection
                   </span>
-                  <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold tracking-wide text-[#2E2528] uppercase mt-1 leading-tight">
+                  <h1 className="font-serif text-3xl lg:text-4xl font-bold tracking-wide text-[#2C1B24] uppercase mt-1 leading-tight">
                     {product.name}
                   </h1>
                 </div>
+                
+                {/* Visual Circle Action Toolbar */}
                 <div className="flex gap-2">
                   <button
                     onClick={handleShare}
-                    className="p-2 border border-[#D4AF37]/25 rounded-full hover:bg-white text-[#2E2528] transition-colors"
-                    aria-label="Share product"
+                    className="p-3 border border-[#D4AF37]/25 rounded-full bg-white/70 hover:border-[#E75480] text-[#2C1B24] transition-all hover:scale-105"
+                    aria-label="Share page link"
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-4.5 h-4.5" />
                   </button>
                   <button
                     onClick={handleToggleWishlist}
-                    className={`p-2 border rounded-full transition-all ${
+                    className={`p-3 border rounded-full transition-all hover:scale-105 ${
                       hasLiked
-                        ? "bg-[#D4AF37] border-[#D4AF37] text-white"
-                        : "border-[#D4AF37]/25 hover:bg-white text-[#2E2528]"
+                        ? "bg-[#E75480] border-[#E75480] text-white shadow-md"
+                        : "border-[#D4AF37]/25 bg-white/70 text-[#2C1B24] hover:border-[#E75480]"
                     }`}
-                    aria-label="Toggle Wishlist"
+                    aria-label="Toggle Wishlist status"
                   >
-                    <Heart className={`w-4 h-4 ${hasLiked ? "fill-current" : ""}`} />
+                    <Heart className={`w-4.5 h-4.5 ${hasLiked ? "fill-current" : ""}`} />
                   </button>
                 </div>
               </div>
 
-              {/* Star Ratings Summary */}
+              {/* Star Rating Reviews Summary */}
               <div className="flex items-center gap-1.5 pt-1">
                 <div className="flex text-[#D4AF37]">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -186,37 +220,37 @@ export default function ProductDetailPage() {
                     />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-[#2E2528]">{product.rating}</span>
-                <span className="text-xs text-[#6B5E62] font-medium">
-                  ({product.reviewsCount} verified reviews)
+                <span className="text-xs font-bold text-[#2C1B24]">{product.rating}</span>
+                <span className="text-[10px] text-[#7A6A73] font-bold uppercase tracking-widest pl-1">
+                  • {product.reviewsCount} verified reviews
                 </span>
               </div>
             </div>
 
-            {/* Price section */}
-            <div className="flex items-baseline gap-3 py-3 border-y border-[#D4AF37]/15">
+            {/* Price Headers */}
+            <div className="flex items-baseline gap-3.5 py-4 border-y border-[#D4AF37]/15">
               <span className="text-2xl font-bold text-[#D4AF37]">₹{product.price.toLocaleString("en-IN")}</span>
               {product.originalPrice && (
                 <>
-                  <span className="text-sm text-[#6B5E62] line-through">₹{product.originalPrice.toLocaleString("en-IN")}</span>
-                  <span className="bg-[#FDE2E4] text-[#2E2528] text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border border-[#D4AF37]/15">
+                  <span className="text-sm text-[#7A6A73] line-through">₹{product.originalPrice.toLocaleString("en-IN")}</span>
+                  <span className="bg-[#FFEFF7] text-[#E75480] text-[8px] font-bold tracking-[0.2em] uppercase px-3 py-1 rounded border border-[#E75480]/20 ml-2">
                     Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                   </span>
                 </>
               )}
             </div>
 
-            {/* Description */}
-            <p className="text-xs md:text-sm text-[#6B5E62] leading-relaxed font-sans tracking-wide">
-              {product.description} Handcrafted with extreme focus and modern aesthetics, this curation reflects luxury and premium elegance tailored to look stunning on the modern woman.
+            {/* Curated Description */}
+            <p className="text-xs md:text-sm text-[#7A6A73] leading-relaxed font-medium tracking-wide">
+              {product.description} Carefully hand-selected, polished, and mounted to luxury standards. Designed to look breathtakingly elegant, feminine, and classic in both natural daylight and candlelit ballroom settings.
             </p>
 
             {/* Ring / Bracelet sizes */}
             {product.sizes.length > 0 && product.sizes[0] !== "One Size" && (
               <div className="space-y-3">
-                <div className="flex justify-between items-center text-xs text-[#2E2528]">
-                  <span className="font-bold uppercase tracking-wider">Select Size</span>
-                  <button className="text-[10px] text-[#6B5E62] hover:text-[#D4AF37] underline tracking-widest uppercase font-semibold">
+                <div className="flex justify-between items-center text-xs text-[#2C1B24]">
+                  <span className="font-bold uppercase tracking-[0.2em]">Select Size</span>
+                  <button className="text-[9px] text-[#7A6A73] hover:text-[#E75480] underline tracking-widest uppercase font-bold">
                     Size Guide
                   </button>
                 </div>
@@ -224,11 +258,12 @@ export default function ProductDetailPage() {
                   {product.sizes.map((sz) => (
                     <button
                       key={sz}
+                      type="button"
                       onClick={() => setSelectedSize(sz)}
-                      className={`w-10 h-10 text-xs font-bold uppercase rounded-full border transition-all duration-300 flex items-center justify-center ${
+                      className={`w-11 h-11 text-xs font-bold uppercase rounded-full border transition-all duration-300 flex items-center justify-center ${
                         selectedSize === sz
-                          ? "bg-[#2E2528] border-[#2E2528] text-[#FFF6F6] scale-105 shadow-sm"
-                          : "border-[#D4AF37]/20 bg-white text-[#2E2528] hover:border-[#D4AF37]"
+                          ? "bg-[#2C1B24] border-[#2C1B24] text-white scale-105 shadow-md"
+                          : "border-[#D4AF37]/20 bg-white text-[#2C1B24] hover:border-[#E75480]"
                       }`}
                     >
                       {sz}
@@ -243,17 +278,19 @@ export default function ProductDetailPage() {
               {product.inStock ? (
                 <div className="flex gap-4">
                   {/* Quantity selector */}
-                  <div className="flex items-center border border-[#D4AF37]/30 rounded-lg bg-[#FFF6F6] overflow-hidden">
+                  <div className="flex items-center border border-[#D4AF37]/25 rounded bg-[#FFF5FA] overflow-hidden">
                     <button
+                      type="button"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-3.5 hover:bg-[#FDE2E4] transition-colors"
+                      className="px-3.5 py-4 hover:bg-[#FFEFF7] text-[#2C1B24] font-bold transition-colors"
                     >
                       -
                     </button>
-                    <span className="px-4 text-sm font-bold text-[#2E2528]">{quantity}</span>
+                    <span className="px-4 text-xs font-bold text-[#2C1B24]">{quantity}</span>
                     <button
+                      type="button"
                       onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-3.5 hover:bg-[#FDE2E4] transition-colors"
+                      className="px-3.5 py-4 hover:bg-[#FFEFF7] text-[#2C1B24] font-bold transition-colors"
                     >
                       +
                     </button>
@@ -261,92 +298,92 @@ export default function ProductDetailPage() {
 
                   <button
                     onClick={handleAddToCart}
-                    className="flex-grow py-3.5 bg-[#2E2528] text-white text-xs font-semibold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-300 flex items-center justify-center gap-2.5 shadow-luxury"
+                    className="flex-grow py-4 bg-gradient-to-r from-[#E75480] to-[#2C1B24] text-white text-xs font-bold uppercase tracking-[0.25em] hover:shadow-[0_8px_25px_rgba(231,84,128,0.2)] transition-all duration-300 flex items-center justify-center gap-2.5 rounded shadow-md"
                   >
-                    <ShoppingBag className="w-4 h-4" /> Add to Shopping Bag
+                    <ShoppingBag className="w-4 h-4 text-[#D4AF37]" /> Add to Shopping Bag
                   </button>
                 </div>
               ) : (
                 <button
                   disabled
-                  className="w-full py-3.5 bg-[#6B5E62] text-white/50 text-xs font-semibold uppercase tracking-widest cursor-not-allowed text-center"
+                  className="w-full py-4 bg-[#7A6A73] text-white/50 text-xs font-bold uppercase tracking-widest cursor-not-allowed text-center rounded"
                 >
                   Temporarily Sold Out
                 </button>
               )}
             </div>
 
-            {/* Premium details accordion tab */}
-            <div className="border border-[#D4AF37]/15 rounded-lg overflow-hidden bg-white shadow-sm mt-8">
-              {/* Tab Header selectors */}
-              <div className="grid grid-cols-3 text-center border-b border-[#D4AF37]/10 text-[10px] md:text-xs font-bold uppercase tracking-wider">
+            {/* Premium details Accordion tabs */}
+            <div className="border border-[#D4AF37]/20 rounded-2xl overflow-hidden bg-white shadow-sm mt-8">
+              {/* Tab headers */}
+              <div className="grid grid-cols-3 text-center border-b border-[#D4AF37]/15 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.18em]">
                 <button
                   onClick={() => setActiveTab("spec")}
-                  className={`py-3 transition-colors ${
+                  className={`py-3.5 transition-colors ${
                     activeTab === "spec"
-                      ? "bg-[#FFF6F6] text-[#D4AF37] border-b-2 border-[#D4AF37]"
-                      : "text-[#6B5E62] hover:bg-[#FFF6F6]/30"
+                      ? "bg-[#FFF5FA] text-[#E75480] border-b-2 border-[#E75480]"
+                      : "text-[#7A6A73] hover:bg-[#FFF5FA]/30"
                   }`}
                 >
                   Specifications
                 </button>
                 <button
                   onClick={() => setActiveTab("shipping")}
-                  className={`py-3 transition-colors ${
+                  className={`py-3.5 transition-colors ${
                     activeTab === "shipping"
-                      ? "bg-[#FFF6F6] text-[#D4AF37] border-b-2 border-[#D4AF37]"
-                      : "text-[#6B5E62] hover:bg-[#FFF6F6]/30"
+                      ? "bg-[#FFF5FA] text-[#E75480] border-b-2 border-[#E75480]"
+                      : "text-[#7A6A73] hover:bg-[#FFF5FA]/30"
                   }`}
                 >
-                  Shipping & Returns
+                  Shipping
                 </button>
                 <button
                   onClick={() => setActiveTab("gifting")}
-                  className={`py-3 transition-colors ${
+                  className={`py-3.5 transition-colors ${
                     activeTab === "gifting"
-                      ? "bg-[#FFF6F6] text-[#D4AF37] border-b-2 border-[#D4AF37]"
-                      : "text-[#6B5E62] hover:bg-[#FFF6F6]/30"
+                      ? "bg-[#FFF5FA] text-[#E75480] border-b-2 border-[#E75480]"
+                      : "text-[#7A6A73] hover:bg-[#FFF5FA]/30"
                   }`}
                 >
-                  Gifting Options
+                  Gift Box
                 </button>
               </div>
 
-              {/* Tab Content panels */}
-              <div className="p-4 text-xs leading-relaxed text-[#6B5E62]">
+              {/* Tab panels */}
+              <div className="p-5 text-[11px] leading-relaxed text-[#7A6A73] font-medium text-left">
                 {activeTab === "spec" && (
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 font-medium">
+                  <div className="grid grid-cols-1 gap-y-2.5">
                     {Object.entries(product.specifications).map(([key, val]) => (
                       <div key={key} className="flex justify-between border-b border-[#D4AF37]/5 pb-1">
-                        <span className="uppercase text-[#2E2528]/80 text-[10px] tracking-wider">{key}</span>
-                        <span className="text-[#2E2528] text-[10px] text-right font-bold">{val}</span>
+                        <span className="uppercase text-[#7A6A73] text-[9.5px] tracking-wider">{key}</span>
+                        <span className="text-[#2C1B24] font-bold text-[9.5px] uppercase tracking-wide">{val}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
                 {activeTab === "shipping" && (
-                  <div className="space-y-2 text-left">
+                  <div className="space-y-3.5">
                     <div className="flex gap-2">
                       <Shield className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <p><strong>Insured Delivery:</strong> All orders are packed in fully secure, tamper-proof premium packages, insured from our door to yours.</p>
+                      <p>All packaging is completely insulated, double-boxed, and shipped tracked within 48 hours.</p>
                     </div>
                     <div className="flex gap-2">
                       <RefreshCw className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <p><strong>30-Day returns:</strong> Unworn items with tags attached can be returned easily within 30 days for complimentary exchanges.</p>
+                      <p>30-day exchange window if tags are intact.</p>
                     </div>
                   </div>
                 )}
 
                 {activeTab === "gifting" && (
-                  <div className="space-y-2 text-left">
+                  <div className="space-y-3.5">
                     <div className="flex gap-2">
                       <Gift className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <p><strong>Complimentary Signature Box:</strong> Every item arrives housed inside our luxurious pink & gold Monihar signature jewellery case.</p>
+                      <p>Every piece arrives inside our gold-foil signature House of Monihar blushing drawer chest.</p>
                     </div>
                     <div className="flex gap-2">
                       <Award className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <p><strong>Gifting Note:</strong> Add a personalized, gold-pressed gift note during checkout for an extremely premium unboxing surprise.</p>
+                      <p>Add a personalized gold-pressed lettercard during billing steps.</p>
                     </div>
                   </div>
                 )}
@@ -357,60 +394,89 @@ export default function ProductDetailPage() {
 
         </div>
 
-        {/* CUSTOMER REVIEWS LIST */}
-        <section className="bg-white border border-[#D4AF37]/15 rounded-xl p-6 md:p-8 mt-16 text-left">
-          <h3 className="font-serif text-lg md:text-xl font-bold text-[#2E2528] uppercase tracking-wider mb-6 pb-2 border-b border-[#D4AF37]/10">
-            Patron Reviews
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-[#D4AF37]/10 mb-8 items-center">
-            {/* Stats summary */}
-            <div className="space-y-1">
-              <span className="text-4xl md:text-5xl font-serif font-bold text-[#D4AF37]">{product.rating}</span>
-              <p className="text-xs uppercase font-bold tracking-widest text-[#2E2528]">Out of 5 Stars</p>
-              <div className="flex text-[#D4AF37] pt-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
+        {/* RELATED PRODUCTS */}
+        {relatedProducts.length > 0 && (
+          <section className="mt-20 pt-16 border-t border-[#D4AF37]/20 text-left">
+            <div className="flex justify-between items-end mb-8">
+              <div className="space-y-1">
+                <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#D4AF37]">Complementary Curation</span>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#2C1B24]">You May Also Love</h3>
               </div>
+              <Link
+                href={`/products?category=${product.category}`}
+                className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#E75480] hover:text-[#2C1B24] transition-colors"
+              >
+                View Collection <ArrowRight className="w-3.5 h-3.5 inline ml-1" />
+              </Link>
             </div>
 
-            <div className="space-y-2 col-span-2">
-              <p className="text-xs text-[#6B5E62] leading-relaxed">
-                Our reviews are compiled from actual verified buyers who have purchased and enjoyed our handpicked creations. Monihar commits to standard premium quality in every gold-pressed item.
-              </p>
-            </div>
-          </div>
-
-          {/* List of reviews */}
-          <div className="space-y-6">
-            {Array.from({ length: 3 }).map((_, rIdx) => {
-              const name = ["Seraphina K.", "Isabella D.", "Nila Mukhopadhyay"][rIdx];
-              const date = ["May 24, 2026", "May 18, 2026", "April 29, 2026"][rIdx];
-              const content = [
-                "Absolutely breathtaking ring. The 18k solid gold finish has an incredible weight and luster. Size fits exactly according to the guide.",
-                "Fast shipping and gorgeous soft pink signature presentation. The akoya pearls are matched brilliantly with amazing depth.",
-                "Handcrafted luxury indeed. Monihar is my new go-to brand for layering necklaces. Compliments received on day one!"
-              ][rIdx];
-              return (
-                <div key={rIdx} className="space-y-2 border-b border-[#D4AF37]/5 pb-6 last:border-b-0 last:pb-0">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h4 className="text-xs font-bold text-[#2E2528] uppercase tracking-wider">{name}</h4>
-                      <div className="flex text-[#D4AF37] mt-0.5">
-                        {Array.from({ length: 5 }).map((_, s) => (
-                          <Star key={s} className="w-3 h-3 fill-current" />
-                        ))}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((prod) => (
+                <div
+                  key={prod.id}
+                  className="bg-[#FFF9FC] rounded-2xl border border-[#D4AF37]/15 overflow-hidden group shadow-sm flex flex-col justify-between luxury-card"
+                >
+                  <Link href={`/products/${prod.id}`} className="block relative aspect-square bg-[#FFEFF7] overflow-hidden">
+                    <img
+                      src={prod.images[0]}
+                      alt={prod.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                    />
+                    <img
+                      src={prod.images[1] || prod.images[0]}
+                      alt={prod.name}
+                      className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    />
+                    <div className="absolute inset-0 bg-[#2C1B24]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 pointer-events-none">
+                      <div className="px-4 py-2 bg-white/95 text-[#2C1B24] rounded-full text-[9px] font-bold uppercase tracking-widest shadow-md flex items-center gap-1.5 backdrop-blur-sm">
+                        <Eye className="w-3.5 h-3.5" /> Details
                       </div>
                     </div>
-                    <span className="text-[10px] text-[#6B5E62] font-semibold">{date}</span>
-                  </div>
-                  <p className="text-xs text-[#6B5E62] leading-relaxed font-sans">{content}</p>
-                </div>
-              );
-            })}
-          </div>
+                  </Link>
 
+                  <div className="p-4 space-y-2 flex-grow flex flex-col justify-between">
+                    <div>
+                      <span className="text-[8px] uppercase tracking-widest text-[#7A6A73] font-bold">{prod.category}</span>
+                      <Link href={`/products/${prod.id}`} className="block">
+                        <h4 className="text-[10px] font-bold text-[#2C1B24] uppercase tracking-[0.18em] line-clamp-1 group-hover:text-[#E75480] transition-colors mt-0.5">
+                          {prod.name}
+                        </h4>
+                      </Link>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-[#D4AF37]/5 mt-2">
+                      <span className="text-xs font-bold text-[#D4AF37]">₹{prod.price.toLocaleString("en-IN")}</span>
+                      <span className="text-[9px] text-[#7A6A73] font-bold flex items-center gap-0.5">
+                        <Star className="w-3 h-3 text-[#D4AF37] fill-current" /> {prod.rating}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* STYLE INSPIRATION (Lookbook Grid) */}
+        <section className="mt-20 pt-16 border-t border-[#D4AF37]/20 text-left space-y-8">
+          <div className="space-y-1">
+            <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#D4AF37]">Pinterest Styling Lookbook</span>
+            <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#2C1B24]">Aesthetic Inspiration</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {lookbookImages.map((img, i) => (
+              <div
+                key={i}
+                className="aspect-[3/4] rounded-2xl overflow-hidden border border-[#D4AF37]/15 bg-[#FFEFF7] relative group"
+              >
+                <div className="absolute inset-0 bg-[#2C1B24]/10 group-hover:bg-[#2C1B24]/30 z-10 transition-all" />
+                <img
+                  src={img}
+                  alt={`Aesthetic lookbook matching category ${i + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
+                />
+              </div>
+            ))}
+          </div>
         </section>
 
       </div>

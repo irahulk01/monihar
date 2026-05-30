@@ -1,40 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 
-const ANNOUNCEMENTS = [
-  "✨ FREE SHIPPING ON ORDERS OVER ₹1,499 • COMPLIMENTARY SIGNATURE LUXURY PACKAGING ✨",
-  "🌹 GET 10% OFF YOUR FIRST ORDER • USE CODE: WELCOME10 🌹",
-  "💫 FESTIVE GOLD CELEBRATION • 15% OFF ON ORDERS OVER ₹2,499 (CODE: MONIHARGOLD) 💫",
-  "💎 HANDCRAFTED FINE JEWELLERY FOR THE MODERN INDIAN WOMAN 💎"
+const MARQUEE_ITEMS = [
+  "HANDMADE JEWELLERY",
+  "PEARL COLLECTION",
+  "KOREAN FASHION EDITS",
+  "RESIN ARTISTRY",
+  "OXIDIZED BEAUTY",
+  "TERRACOTTA LOVE",
+  "BEADED DESIGNS",
+  "FREE SHIPPING ON ORDERS OVER ₹1,499",
+  "USE CODE: WELCOME10 FOR 10% OFF",
 ];
 
 export default function AnnouncementBar() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+  // Join item array with diamond dividers and duplicate to create seamless looping track
+  const trackContent = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
 
   return (
-    <div className="w-full bg-[#2E2528] text-[#FFF6F6] py-2 px-4 text-center overflow-hidden border-b border-[#D4AF37]/20 relative z-50">
-      <div className="max-w-7xl mx-auto h-5 relative flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={index}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="text-xs md:text-sm tracking-[0.15em] font-medium font-sans uppercase"
-          >
-            {ANNOUNCEMENTS[index]}
-          </motion.p>
-        </AnimatePresence>
+    <div className="w-full bg-[#2C1B24] text-[#FFF9FC] py-3.5 overflow-hidden border-b border-[#D4AF37]/35 relative z-50 select-none">
+      <div className="flex w-full relative">
+        <div className="animate-marquee-track flex items-center whitespace-nowrap gap-10">
+          {trackContent.map((text, idx) => (
+            <div key={idx} className="flex items-center gap-10 text-[10px] md:text-xs font-bold uppercase tracking-[0.25em]">
+              <span className="text-[#FFF9FC] hover:text-[#D4AF37] transition-colors duration-300">
+                {text}
+              </span>
+              <span className="text-[#D4AF37] font-medium text-xs">✦</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
