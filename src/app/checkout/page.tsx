@@ -31,6 +31,7 @@ export default function CheckoutPage() {
 
   // Loading sequences
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isNavigatingToSuccess, setIsNavigatingToSuccess] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
 
   const loadingMessages = [
@@ -56,12 +57,12 @@ export default function CheckoutPage() {
 
   // Prevent accessing checkout if cart is empty
   useEffect(() => {
-    if (!isProcessing && items.length === 0) {
+    if (!isProcessing && !isNavigatingToSuccess && items.length === 0) {
       router.replace("/products");
     }
-  }, [items, router, isProcessing]);
+  }, [items, router, isProcessing, isNavigatingToSuccess]);
 
-  if (items.length === 0 && !isProcessing) return null;
+  if (items.length === 0 && !isProcessing && !isNavigatingToSuccess) return null;
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +119,7 @@ export default function CheckoutPage() {
       clearCart();
 
       // 4. Redirect to order success
+      setIsNavigatingToSuccess(true);
       setIsProcessing(false);
       router.push("/success");
     }, 2800);
